@@ -6,7 +6,6 @@ use WPStaging\Backend\Optimizer\Optimizer;
 use WPStaging\Bootstrap\V1\WpstgBootstrap;
 use WPStaging\Core\Utils\IISWebConfig;
 use WPStaging\Core\Utils\Htaccess;
-use WPStaging\Core\Utils\Filesystem;
 
 /**
  * Install Class
@@ -30,8 +29,6 @@ class Install
             $this->initCron();
             $this->installOptimizer();
             $this->createHtaccess();
-            $this->createIndex();
-            $this->createWebConfig();
         }
     }
 
@@ -58,25 +55,9 @@ class Install
     private function createHtaccess()
     {
         $htaccess = new Htaccess();
-        $htaccess->create(trailingslashit(\WPStaging\Core\WPStaging::getContentDir()) . '.htaccess');
-        $htaccess->create(trailingslashit(\WPStaging\Core\WPStaging::getContentDir()) . 'logs/.htaccess');
 
         if (extension_loaded('litespeed')) {
             $htaccess->createLitespeed(ABSPATH . '.htaccess');
         }
-    }
-
-    private function createIndex()
-    {
-        $filesystem = new Filesystem();
-        $filesystem->create(trailingslashit(\WPStaging\Core\WPStaging::getContentDir()) . 'index.php', "<?php // silence");
-        $filesystem->create(trailingslashit(\WPStaging\Core\WPStaging::getContentDir()) . 'logs/index.php', "<?php // silence");
-    }
-
-    private function createWebConfig()
-    {
-        $webconfig = new IISWebConfig();
-        $webconfig->create(trailingslashit(\WPStaging\Core\WPStaging::getContentDir()) . 'web.config');
-        $webconfig->create(trailingslashit(\WPStaging\Core\WPStaging::getContentDir()) . 'logs/web.config');
     }
 }

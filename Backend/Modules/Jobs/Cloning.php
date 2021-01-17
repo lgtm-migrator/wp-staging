@@ -179,6 +179,9 @@ class Cloning extends Job
         // Process lock state
         $this->options->isRunning = true;
 
+        // id of the user creating the clone
+        $this->options->ownerId = get_current_user_id();
+
         // Save Clone data
         $this->saveClone();
 
@@ -217,7 +220,8 @@ class Cloning extends Job
             "databaseServer" => $this->options->databaseServer,
             "databasePrefix" => $this->options->databasePrefix,
             "emailsDisabled"   => (bool) $this->options->emailsDisabled,
-            "uploadsSymlinked" => (bool)$this->options->uploadsSymlinked
+            "uploadsSymlinked" => (bool)$this->options->uploadsSymlinked,
+            "ownerId" => $this->options->ownerId,
         ];
 
         if (update_option("wpstg_existing_clones_beta", $this->options->existingClones) === false) {

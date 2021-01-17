@@ -3,8 +3,8 @@
 namespace WPStaging\Backend\Modules\Jobs;
 
 use SplFileObject;
-use WPStaging\Framework\Filesystem\FileService;
 use WPStaging\Core\Utils\Logger;
+use WPStaging\Framework\Filesystem\Filesystem;
 use WPStaging\Framework\Filesystem\WpUploadsFolderSymlinker;
 use WPStaging\Framework\Utils\WpDefaultDirectories;
 
@@ -315,7 +315,7 @@ class Files extends JobExecutable
         $destinationPath = $this->destination . $relativePath;
         $destinationDirectory = dirname($destinationPath);
 
-        if (!is_dir($destinationDirectory) && !mkdir($destinationDirectory, wpstg_get_permissions_for_directory(), true) && !is_dir($destinationDirectory)) {
+        if (!is_dir($destinationDirectory) && !(new Filesystem)->mkdir($destinationDirectory) && !is_dir($destinationDirectory)) {
             $this->log("Files: Can not create directory {$destinationDirectory}. Possible write permission error!", Logger::TYPE_ERROR);
             return false;
         }
@@ -380,7 +380,7 @@ class Files extends JobExecutable
             );
         }
 
-        if ((new FileService)->isFilenameExcluded($file, $excludedFiles)) {
+        if ((new Filesystem)->isFilenameExcluded($file, $excludedFiles)) {
             return true;
         }
 

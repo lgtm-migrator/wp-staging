@@ -15,6 +15,7 @@ if (!class_exists(WpstgFreeRequirements::class)) {
 
         public function checkRequirements()
         {
+            $this->meetsMinimumWordPressVersion();
             $this->proVersionMustNotBeEnabled();
             $this->anotherInstanceOfWpstagingMustNotBeEnabled();
         }
@@ -25,12 +26,12 @@ if (!class_exists(WpstgFreeRequirements::class)) {
         private function proVersionMustNotBeEnabled()
         {
             // Early bail: Pro is not loaded, therefore there's no need for further checks.
-            if (!defined('WPSTG_PRO_LOADED')) {
+            if (!defined('WPSTG_PRO_ENTRYPOINT')) {
                 return;
             }
 
-            $this->proPlugin = plugin_basename(WPSTG_PRO_LOADED);
-            $this->freePlugin = plugin_basename($this->pluginFile);
+            $this->proPlugin  = plugin_basename(WPSTG_PRO_ENTRYPOINT);
+            $this->freePlugin = plugin_basename($this->entryPoint);
 
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
@@ -50,9 +51,9 @@ if (!class_exists(WpstgFreeRequirements::class)) {
          */
         private function anotherInstanceOfWpstagingMustNotBeEnabled()
         {
-            $oldVersionsLoaded = defined('WPSTG_PLUGIN_DIR') || defined('WPSTG_PLUGIN_FILE');
-            $proVersionLoaded = defined('WPSTG_PRO_LOADED');
-            $anotherFreeVersionLoaded = defined('WPSTG_FREE_LOADED') && $this->pluginFile !== WPSTG_FREE_LOADED;
+            $oldVersionsLoaded        = defined('WPSTG_PLUGIN_DIR') || defined('WPSTG_PLUGIN_FILE');
+            $proVersionLoaded         = defined('WPSTG_PRO_ENTRYPOINT');
+            $anotherFreeVersionLoaded = defined('WPSTG_FREE_ENTRYPOINT') && $this->entryPoint !== WPSTG_FREE_ENTRYPOINT;
 
             if ($oldVersionsLoaded || $proVersionLoaded || $anotherFreeVersionLoaded) {
                 $this->notificationMessage = __('Another instance of WP STAGING is activated, therefore other instances of WP STAGING were automatically prevented from running to avoid errors. Please leave only one instance of the WP STAGING plugin active.', 'wp-staging');
@@ -65,9 +66,8 @@ if (!class_exists(WpstgFreeRequirements::class)) {
                     $this->notificationMessage = __('Another instance of WP STAGING was activated, therefore other instances of the WP STAGING plugin were prevented from loading. Please ask the site administrator to leave only one instance of WP STAGING active.', 'wp-staging');
                     add_action('admin_notices', [$this, '_displayWarning']);
                 }
-                if (defined('WPSTG_DEBUG') && WPSTG_DEBUG === true) {
-                    throw new \RuntimeException(sprintf("Another instance of WP STAGING is activated, therefore other instances of WP STAGING were automatically prevented from running to avoid errors. Please leave only one instance of the WP STAGING plugin active. Plugin that was prevented from loading: %s", $this->pluginFile));
-                }
+
+                throw new \RuntimeException(sprintf("Another instance of WP STAGING is activated, therefore other instances of WP STAGING were automatically prevented from running to avoid errors. Please leave only one instance of the WP STAGING plugin active. Plugin that was prevented from loading: %s", $this->entryPoint));
             }
         }
 

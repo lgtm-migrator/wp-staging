@@ -501,7 +501,7 @@ class Administrator
     public function ajaxRestart()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         $process = new ProcessLock();
@@ -514,7 +514,7 @@ class Administrator
     public function ajaxOverview()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         // Existing clones
@@ -539,7 +539,7 @@ class Administrator
     public function ajaxCloneScan()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         // Check first if there is already a process running
@@ -566,7 +566,7 @@ class Administrator
     public function ajaxCheckCloneName()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         $cloneName = sanitize_key($_POST["cloneID"]);
@@ -602,7 +602,7 @@ class Administrator
     public function ajaxUpdateProcess()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         $cloning = new Updating();
@@ -622,7 +622,7 @@ class Administrator
     public function ajaxStartClone()
     {
         if (!$this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         // Check first if there is already a process running
@@ -646,16 +646,14 @@ class Administrator
     public function ajaxCloneDatabase()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
-
-        $cloning = new Cloning();
 
         // Uncomment these lines to test different error codes
         //http_response_code(504);
         //wp_send_json( '<html><body><head></head><body>test</body></html>' );
 
-        wp_send_json($cloning->start());
+        wp_send_json((new Cloning)->start());
     }
 
     /**
@@ -664,12 +662,10 @@ class Administrator
     public function ajaxPrepareDirectories()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
-        $cloning = new Cloning();
-
-        wp_send_json($cloning->start());
+        wp_send_json((new Cloning)->start());
     }
 
     /**
@@ -678,12 +674,10 @@ class Administrator
     public function ajaxCopyFiles()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
-        $cloning = new Cloning();
-
-        wp_send_json($cloning->start());
+        wp_send_json((new Cloning)->start());
     }
 
     /**
@@ -692,12 +686,10 @@ class Administrator
     public function ajaxReplaceData()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
-        $cloning = new Cloning();
-
-        wp_send_json($cloning->start());
+        wp_send_json((new Cloning)->start());
     }
 
     /**
@@ -706,12 +698,10 @@ class Administrator
     public function ajaxFinish()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
-        $cloning = new Cloning();
-
-        wp_send_json($cloning->start());
+        wp_send_json((new Cloning)->start());
     }
 
     /**
@@ -720,7 +710,7 @@ class Administrator
     public function ajaxDeleteConfirmation()
     {
         if (!$this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         $delete = new Delete();
@@ -741,12 +731,10 @@ class Administrator
     public function ajaxDeleteClone()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
-        $delete = new Delete();
-
-        wp_send_json($delete->start());
+        wp_send_json((new Delete)->start());
     }
 
     /**
@@ -755,12 +743,10 @@ class Administrator
     public function ajaxCancelClone()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
-        $cancel = new Cancel();
-
-        wp_send_json($cancel->start());
+        wp_send_json((new Cancel)->start());
     }
 
     /**
@@ -769,11 +755,10 @@ class Administrator
     public function ajaxCancelUpdate()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
-        $cancel = new CancelUpdate();
-        wp_send_json($cancel->start());
+        wp_send_json((new CancelUpdate)->start());
     }
 
     /**
@@ -781,45 +766,40 @@ class Administrator
      */
     public function messages()
     {
-        $notice = new Notices($this->path, $this->url);
-
-        $run = $notice->messages();
+        (new Notices($this->path, $this->url))->messages();
     }
 
     /**
      * Ajax Hide Poll
      * @todo check if this is being used, remove otherwise.
-     * @return mixed boolean | json
      */
     public function ajaxHidePoll()
     {
         if (update_option("wpstg_poll", "no") !== false) {
             wp_send_json(true);
         }
-        return wp_send_json(null);
+
+        wp_send_json(null);
     }
 
     /**
      * Ajax Hide Rating
      *
      * Runs when the user dismisses the notice to rate the plugin.
-     *
-     * @return mixed bool | json
      */
     public function ajaxHideRating()
     {
         if (update_option("wpstg_rating", "no") !== false) {
             wp_send_json(true);
         }
-        return wp_send_json(null);
+
+        wp_send_json(null);
     }
 
     /**
      * Ajax Hide Rating and show it again after one week
      *
      * Runs when the user chooses to rate the plugin later.
-     *
-     * @return mixed bool | json
      */
     public function ajaxHideLaterRating()
     {
@@ -827,7 +807,8 @@ class Administrator
         if (update_option('wpstg_rating', $date) !== false) {
             wp_send_json(true);
         }
-        return wp_send_json(false);
+
+        wp_send_json(false);
     }
 
     /**
@@ -840,14 +821,14 @@ class Administrator
 
     /**
      * Ajax Hide Cache Notice shown on staging site
-     * @return mixed boolean | json
      */
     public function ajaxHideCacheNotice()
     {
         if ((new DisabledCacheNotice())->disable() !== false) {
             wp_send_json(true);
         }
-        return wp_send_json(null);
+
+        wp_send_json(null);
     }
 
     /**
@@ -856,11 +837,10 @@ class Administrator
     public function ajaxLogs()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
-        $logs = new Logs();
-        wp_send_json($logs->start());
+        wp_send_json((new Logs)->start());
     }
 
     /**
@@ -882,7 +862,7 @@ class Administrator
     public function ajaxEditCloneData()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         $listOfClones = get_option("wpstg_existing_clones_beta", []);
@@ -902,7 +882,7 @@ class Administrator
     public function ajaxSaveCloneData()
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         $listOfClones = get_option("wpstg_existing_clones_beta", []);
@@ -982,8 +962,7 @@ class Administrator
         }
 
         // Start the process
-        $processing = new Processing();
-        wp_send_json($processing->start());
+        wp_send_json((new Processing)->start());
     }
 
     /**
@@ -1005,7 +984,7 @@ class Administrator
     public function ajaxSendReport($args = [])
     {
         if ( ! $this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         // Set params
@@ -1058,7 +1037,7 @@ class Administrator
     public function ajaxDatabaseConnect()
     {
         if (!$this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         $args = $_POST;
@@ -1085,11 +1064,11 @@ class Administrator
     public function ajaxDatabaseVerification()
     {
         if (!$this->isAuthenticated()) {
-            return false;
+            return;
         }
 
         if (!$this->isPro()) {
-            return false;
+            return;
         }
 
         $user = !empty($_POST['databaseUser']) ? $_POST['databaseUser'] : '';

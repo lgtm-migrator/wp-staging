@@ -443,38 +443,6 @@ function wpstg_chmod($file, $mode = false)
 }
 
 /**
- * Create file if it does not exist
- *
- * @param string $path
- * @param (int|false) $chmod The permissions as octal number (or false to skip chmod)
- * @param (string|int) $chown A user name or number (or false to skip chown).
- * @return boolean true on success, false on failure.
- */
-function wpstg_mkdir($path, $chmod = false, $chown = false)
-{
-    // Safe mode fails with a trailing slash under certain PHP versions.
-    $path = untrailingslashit($path);
-    if (empty($path)) {
-        return false;
-    }
-
-    if (!$chmod) {
-        $chmod = FS_CHMOD_DIR;
-    }
-
-    if (!@mkdir($path)) {
-        return false;
-    }
-    wpstg_chmod($path, $chmod);
-
-    if ($chown) {
-        wpstg_chown($path, $chown);
-    }
-
-    return true;
-}
-
-/**
  * Changes the owner of a file or directory.
  *
  *

@@ -3,8 +3,8 @@
 namespace WPStaging\Backend\Modules\Jobs\Multisite;
 
 use WPStaging\Backend\Modules\Jobs\JobExecutable;
-use WPStaging\Framework\Filesystem\FileService;
 use WPStaging\Core\Utils\Logger;
+use WPStaging\Framework\Filesystem\Filesystem;
 use WPStaging\Framework\Filesystem\WpUploadsFolderSymlinker;
 
 /**
@@ -294,7 +294,7 @@ class Files extends JobExecutable
         $destinationPath = $this->destination . $relativePath;
         $destinationDirectory = dirname($destinationPath);
 
-        if (!is_dir($destinationDirectory) && !@mkdir($destinationDirectory, wpstg_get_permissions_for_directory(), true)) {
+        if (!is_dir($destinationDirectory) && !(new Filesystem)->mkdir($destinationDirectory)) {
             $this->log(
                 "Files: Can not create directory {$destinationDirectory}",
                 Logger::TYPE_ERROR
@@ -388,7 +388,7 @@ class Files extends JobExecutable
             );
         }
 
-        if ((new FileService)->isFilenameExcluded($file, $excludedFiles)) {
+        if ((new Filesystem)->isFilenameExcluded($file, $excludedFiles)) {
             return true;
         }
 

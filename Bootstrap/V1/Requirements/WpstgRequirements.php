@@ -7,15 +7,39 @@ if (!class_exists(WpstgRequirements::class)) {
     {
         protected $notificationTitle   = '';
         protected $notificationMessage = '';
-        protected $pluginFile;
+        protected $entryPoint;
 
-        public function __construct($pluginFile)
+        public function __construct($entryPoint)
         {
-            $this->pluginFile = $pluginFile;
+            $this->entryPoint = $entryPoint;
         }
 
         abstract public function checkRequirements();
 
+        /**
+         * Checks if the current WordPress version is above
+         * the minimum required.
+         */
+        protected function meetsMinimumWordPressVersion()
+        {
+            $minimumWordPressVersion = '4.0';
+            $currentWordPressVersion = get_bloginfo('version');
+
+            $meets = version_compare($currentWordPressVersion, $minimumWordPressVersion, '>=');
+
+            if (!$meets) {
+                $this->notificationMessage = __(sprintf('WPSTAGING requires at least WordPress %s to run. You have WordPress %s.', $minimumWordPressVersion, $currentWordPressVersion), 'wp-staging');
+                add_action('admin_notices', [$this, '_displayWarning']);
+
+                throw new \RuntimeException($this->notificationMessage);
+            }
+        }
+
+        /**
+         * Usage:
+         * $this->notificationMessage = 'Foo';
+         * add_action('admin_notices', [$this, '_displayWarning']);
+         */
         public function _displayWarning()
         {
             $title   = esc_html($this->notificationTitle ?: __('WP STAGING', 'wp-staging'));

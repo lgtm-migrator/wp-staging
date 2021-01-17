@@ -15,6 +15,7 @@ use WPStaging\Backend\Pro\Notices\Notices as ProNotices;
 use WPStaging\Core\Utils\Cache;
 use WPStaging\Core\Utils\Logger;
 use WPStaging\Core\WPStaging;
+use WPStaging\Framework\DI\Container;
 
 /**
  * Class Notices
@@ -31,6 +32,11 @@ class Notices
      * @var string
      */
     private $url;
+
+    /**
+     * @var string The key that holds directory listing errors in the container.
+     */
+    public static $directoryListingErrors = 'directoryListingErrors';
 
     public function __construct($path, $url)
     {
@@ -179,6 +185,37 @@ class Notices
         if ($this->isDifferentScheme()) {
             require_once "{$viewsNoticesPath}wrong-scheme.php";
         }
+
+        $this->showDirectoryListingWarningNotice($viewsNoticesPath);
+    }
+
+    /**
+     * Displays the notice that we could not prevent
+     * directory listing on a sensitive folder for some reason.
+     *
+     * @see \WPStaging\Framework\Filesystem\Filesystem::mkdir The place where all errors are enqueued
+     *                                                        to be displayed as a single notice here.
+     *
+     * Note: When refactoring this, keep in mind this code should be
+     * called only once, otherwise the message would be enqueued multiple times.
+     *
+     * @param string $viewsNoticesPath The path to the views folder.
+     */
+    private function showDirectoryListingWarningNotice($viewsNoticesPath)
+    {
+        $directoryListingErrors = WPStaging::getInstance()->getContainer()->getFromArray(static::$directoryListingErrors);
+
+        // Early bail: No errors to show
+        if (empty($directoryListingErrors)) {
+            return;
+        }
+
+        // Early bail: These warnings were disabled by the user.
+        if ((bool)apply_filters('wpstg.notices.hideDirectoryListingWarnings', false)) {
+            return;
+        }
+
+        require_once "{$viewsNoticesPath}directory-listing-could-not-be-prevented.php";
     }
 
     /**

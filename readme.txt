@@ -9,7 +9,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: clone, backup, staging, duplication, migration
 Requires at least: 3.6+
 Tested up to: 5.6
-Stable tag: 2.8.0
+Stable tag: 1.2.3
 Requires PHP: 5.5
 
 A duplicator plugin - clone/move, duplicate & migrate websites to staging, backup and development sites that only authorized users can access.

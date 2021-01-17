@@ -1295,11 +1295,11 @@ Tooltip top arrow
     color: #f56363;
 }
 
-.swal2-modal .swal2-cancel.wpstg--btn--cancel {
+body.toplevel_page_wpstg_clone .swal2-modal .swal2-cancel.wpstg--btn--cancel {
     margin-bottom: 0;
 }
 
-.swal2-modal .swal2-confirm.wpstg--btn--confirm {
+body.toplevel_page_wpstg_clone .swal2-modal .swal2-confirm.wpstg--btn--confirm {
     font-size: 16px;
     padding: .5em;
     line-height: normal;
@@ -1307,7 +1307,7 @@ Tooltip top arrow
     margin-right: 10px;
 }
 
-.swal2-modal .wpstg-loader {
+body.toplevel_page_wpstg_clone .swal2-modal .wpstg-loader {
     display: inline-block !important;
 }
 
@@ -1930,4 +1930,8 @@ span.wpstg--drag-or-upload {
 
 .wpstg-issue-resubmit-confirmation.swal2-container {
     z-index: 10500;
+}
+
+body.toplevel_page_wpstg_clone .swal2-container .swal2-content {
+    z-index:2;
 }

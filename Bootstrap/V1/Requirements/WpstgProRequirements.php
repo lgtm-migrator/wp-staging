@@ -9,6 +9,7 @@ if (!class_exists(WpstgProRequirements::class)) {
     {
         public function checkRequirements()
         {
+            $this->meetsMinimumWordPressVersion();
             $this->anotherInstanceOfWpstagingMustNotBeEnabled();
         }
 
@@ -18,7 +19,7 @@ if (!class_exists(WpstgProRequirements::class)) {
         private function anotherInstanceOfWpstagingMustNotBeEnabled()
         {
             $oldVersionsLoaded       = defined('WPSTG_PLUGIN_DIR') || defined('WPSTG_PLUGIN_FILE');
-            $anotherProVersionLoaded = defined('WPSTG_PRO_LOADED') && $this->pluginFile !== WPSTG_PRO_LOADED;
+            $anotherProVersionLoaded = defined('WPSTG_PRO_ENTRYPOINT') && $this->entryPoint !== WPSTG_PRO_ENTRYPOINT;
 
             if ($oldVersionsLoaded || $anotherProVersionLoaded) {
                 $this->notificationMessage = __('Another instance of WP STAGING is activated, therefore other instances of WP STAGING were automatically prevented from running to avoid errors. Please leave only one instance of the WP STAGING plugin active.', 'wp-staging');
@@ -31,9 +32,8 @@ if (!class_exists(WpstgProRequirements::class)) {
                     $this->notificationMessage = __('Another instance of WP STAGING was activated, therefore other instances of the WP STAGING plugin were prevented from loading. Please ask the site administrator to leave only one instance of WP STAGING active.', 'wp-staging');
                     add_action('admin_notices', [$this, '_displayWarning']);
                 }
-                if (defined('WPSTG_DEBUG') && WPSTG_DEBUG === true){
-                    throw new \RuntimeException(sprintf("Another instance of WP STAGING is activated, therefore other instances of WP STAGING were automatically prevented from running to avoid errors. Please leave only one instance of the WP STAGING plugin active. Plugin that was prevented from loading: %s", $this->pluginFile));
-                }
+
+                throw new \RuntimeException(sprintf("Another instance of WP STAGING is activated, therefore other instances of WP STAGING were automatically prevented from running to avoid errors. Please leave only one instance of the WP STAGING plugin active. Plugin that was prevented from loading: %s", $this->entryPoint));
             }
         }
     }
